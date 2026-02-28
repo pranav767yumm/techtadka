@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Treasure Hunt | TechTadka</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary-red: #ff4d4d;
+            --accent-purple: #a855f7;
+            --dark-bg: #0a0a0a;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--dark-bg);
+            color: white;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* --- MATCHING BACKGROUND SLIDER --- */
+        .bg-slider {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(10, 10, 10, 1));
+        }
+
+        /* --- NAVIGATION --- */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: gold;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* --- CONTENT CONTAINER --- */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 120px 20px 80px;
+            position: relative;
+        }
+
+        .event-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            color: white;
+            font-size: clamp(2.2rem, 6vw, 4rem);
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px var(--primary-red);
+        }
+
+        .badge {
+            background: var(--primary-red);
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* --- FEATURED IMAGE --- */
+        .main-image {
+            width: 100%;
+            height: 400px;
+            background: url('https://images.unsplash.com/photo-1558403194-611308249627?q=80&w=1200') center/cover;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 40px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        /* --- INFO GRID --- */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 50px;
+        }
+
+        .info-card {
+            background: var(--glass);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            backdrop-filter: blur(5px);
+            transition: 0.3s;
+        }
+
+        .info-card h4 {
+            color: var(--primary-red);
+            margin-bottom: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        /* --- DETAILS CONTENT --- */
+        .details-content h2 {
+            font-family: 'Orbitron', sans-serif;
+            border-left: 4px solid var(--primary-red);
+            padding-left: 15px;
+            margin: 50px 0 20px;
+            font-size: 1.5rem;
+        }
+
+        .details-content ul {
+            margin-left: 20px;
+            color: #ccc;
+        }
+
+        .details-content li {
+            margin-bottom: 10px;
+        }
+
+        /* --- COMPACT PRICE TAG --- */
+        .price-tag {
+            background: linear-gradient(135deg, var(--primary-red), #b91c1c);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 30px;
+            box-shadow: 0 8px 20px rgba(255, 77, 77, 0.2);
+            display: inline-block;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .price-tag p {
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+
+        .price-tag h3 {
+            font-size: 1.8rem;
+            margin: 5px 0;
+            font-family: 'Orbitron';
+        }
+
+        .btn-register {
+            display: inline-block;
+            background: white;
+            color: black;
+            padding: 10px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-top: 10px;
+            transition: 0.3s;
+            font-size: 0.9rem;
+        }
+
+        /* --- MOBILE ADJUSTMENTS --- */
+        @media (max-width: 768px) {
+            nav {
+                padding: 15px 20px;
+            }
+
+            .container {
+                padding-top: 100px;
+            }
+
+            .main-image {
+                height: 250px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .price-tag {
+                max-width: 100%;
+            }
+        }
+
+        .registration-box {
+            background: linear-gradient(135deg, #1a1a1a, #000);
+            padding: 25px;
+            border-radius: 15px;
+            border: 1px solid var(--primary-red);
+            display: inline-block;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(255, 77, 77, 0.2);
+        }
+
+        .step-label {
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.75rem;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .price-display {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        .dual-btn-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn-pay,
+        .btn-form {
+            flex: 1;
+            padding: 15px 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.3s;
+        }
+
+        /* UPI Payment Button Style */
+        .btn-pay {
+            background: var(--primary-red);
+            color: white;
+        }
+
+        /* Google Form Button Style */
+        .btn-form {
+            background: white;
+            color: black;
+        }
+
+        .btn-pay:hover,
+        .btn-form:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
+        }
+
+        .note-text {
+            margin-top: 15px;
+            font-size: 0.75rem;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Mobile Responsiveness: Stack buttons if screen is very narrow */
+        @media (max-width: 480px) {
+            .dual-btn-container {
+                flex-direction: column;
+            }
+
+            .price-display {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="bg-slider">
+        <div class="slide active"
+            style="background-image: url('https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=2070');">
+        </div>
+        <div class="slide"
+            style="background-image: url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=2070');">
+        </div>
+        <div class="overlay"></div>
+    </div>
+
+    <nav>
+        <a href="index.html" class="logo">TechTadka</a>
+        <a href="index.html" style="color: white; text-decoration: none; font-weight: bold;">← Back</a>
+    </nav>
+
+    <div class="container" style="text-align: center;">
+        <header class="event-header">
+            <span class="badge">Logic & Speed</span>
+            <h1>E-Treasure Hunt</h1>
+            <p style="color: #aaa; margin-top: 10px;">AAER's Asian College of Science and Commerce</p>
+        </header>
+
+        <div class="main-image"></div>
+
+        <div class="info-grid">
+            <div class="info-card">
+                <h4>DATE</h4>
+                <p>March 19, 2026</p>
+            </div>
+            <div class="info-card">
+                <h4>LOCATION</h4>
+                <p>Entire College Campus</p>
+            </div>
+            <div class="info-card">
+                <h4>TIME</h4>
+                <p>10:00 AM - 04:00 PM</p>
+            </div>
+        </div>
+
+        <div class="details-content" style="text-align: left;">
+            <h2>About the Event</h2>
+            <p>Embark on a digital adventure like no other. The E-Treasure Hunt combines physical exploration of the
+                campus with digital clue-solving. Use your smartphone to scan codes, solve riddles, and race against the
+                clock to find the ultimate prize.</p>
+
+            <h2>Game Rules</h2>
+            <ul>
+                <li><strong>Start Point:</strong> All teams must gather at the Main Gate by 09:45 AM.</li>
+                <li><strong>Digital Clues:</strong> Every clue is a QR code hidden in plain sight.</li>
+                <li><strong>Tools Allowed:</strong> One smartphone with a working internet connection per team.</li>
+            </ul>
+
+            <h2>Guidelines</h2>
+            <p>1. Participation is Individual or in Pairs (Team of 2).</p>
+            <p>2. No sabotage of other teams' clues or physical barriers allowed.</p>
+            <p>3. The first team to reach the final 'Digital Vault' wins.</p>
+
+            <div style="text-align: center; margin-top: 40px;">
+                <div class="registration-box">
+                    <p class="step-label">Pay Fee / Register</p>
+                    <h3 class="price-display">₹350 Per Team</h3>
+
+                    <div class="dual-btn-container">
+                        <a href="upi://pay?pa=8625816571@ybl&pn=Pranav_shelke&am=350&cu=INR" class="btn-pay">
+                            <span>💳</span> Pay via UPI
+                        </a>
+
+                        <a href="https://forms.gle/HUkXsL1hsoBDNFpH7" target="_blank" class="btn-form">
+                            <span>📝</span> Fill Form
+                        </a>
+                    </div>
+                    <br>
+                    <img src="https://i.postimg.cc/ZKFy9zbN/Whats-App-Image-2026-03-01-at-1-36-03-AM.jpg"
+                        alt="UPI QR Code"
+                        style="width: 300px; height: 300px; border-radius: 10px; border: 2px solid white; box-shadow: 0 0 15px rgba(255,255,255,0.2);">
+                    <p style="font-size: 0.7rem; color: #888; margin-top: 5px;">Scan to Pay ₹500</p>
+                </div>
+                <p class="note-text">Pay first, then upload the screenshot in the form.</p>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        let currentSlide = 0;
+        setInterval(() => {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + 1) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }, 5000);
+    </script>
+</body>
+
+</html>
